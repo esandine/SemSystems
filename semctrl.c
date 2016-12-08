@@ -38,6 +38,7 @@ int createShmem(int *sh){
   printf("mem attatched: %d\n", *sh);
   return shmid;
 }
+
 int main(int argc, char *argv[]){
   int semid;
   int shmid;

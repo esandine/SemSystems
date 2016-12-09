@@ -33,9 +33,6 @@ int createShmem(int *sh){
   //Creates Shmem
   shmid = shmget(key, 4, IPC_CREAT | 0644);
   printf("shmem created %d\n", shmid);
-  //setting shmemaphore value
-  sh = (int*)shmat(shmid, 0, 0);
-  printf("mem attatched: %d\n", *sh);
   return shmid;
 }
 
@@ -45,8 +42,17 @@ int removeSemaphore(){
   //removing a semaphore
   int sc;
   union semun su;
-  sc = semctl(semid, 0, IPC_RMID);
-  printf("semaphore removed: %d\n", sc);
+  sc = semctl(semid, 0, IPC_RMID)
+;  printf("semaphore removed: %d\n", sc);
+}
+
+int removeShmem(){
+  int key = ftok("makefile", 22);
+  int shmid = shmget(key, 0, 0);
+  struct shmid_ds d;
+  shmctl(shmid, IPC_RMID, &d);
+  printf("semaphore removed: %d\n", shmid);
+  return shmid;
 }
 int main(int argc, char *argv[]){
   int semid;
@@ -66,6 +72,7 @@ int main(int argc, char *argv[]){
   }
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
     removeSemaphore();
+    removeShmem();
   }
   return 0;
 

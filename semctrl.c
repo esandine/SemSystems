@@ -17,7 +17,7 @@ int createSemaphore(int* sc){
   int key = ftok("makefile", 22);
   int semid;
   //Creates Semaphore
-  semid = semget(key, 1, IPC_CREAT | 0644);
+  semid = semget(key, 1, IPC_CREAT | IPC_EXCL | 0644);
   printf("semaphore created %d\n", semid);
   union semun su;
   su.val = 10;
@@ -39,6 +39,15 @@ int createShmem(int *sh){
   return shmid;
 }
 
+int removeSemaphore(){
+  int key = ftok("makefile", 22);
+  int semid = semget(key, 1, 0);
+  //removing a semaphore
+  int sc;
+  union semun su;
+  sc = semctl(semid, 0, IPC_RMID);
+  printf("semaphore removed: %d\n", sc);
+}
 int main(int argc, char *argv[]){
   int semid;
   int shmid;
@@ -53,14 +62,10 @@ int main(int argc, char *argv[]){
     semid = semget(key, 1, 0);
     //getting the value of a semaphore
     sc = semctl(semid, 0, GETVAL);
-
     printf("semaphore value: %d\n",sc);
   }
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
-    semid = semget(key, 1, 0);
-    //removing a semaphore
-    sc = semctl(semid, 0, IPC_RMID);
-    printf("semaphore removed: %d\n", sc);
+    removeSemaphore();
   }
   return 0;
 

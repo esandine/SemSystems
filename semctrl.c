@@ -7,14 +7,15 @@
 #include <sys/shm.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
-/*union semun{
+union semun{
   int val;
   struct semi_ds *buf;
   unsigned short *arry;
   struct seminfo *_buf;
-  };*/
+};
 
 int createSemaphore(int* sc){
   int key = ftok("makefile", 22);
@@ -40,7 +41,13 @@ int createShmem(int *sh){
 }
 
 int openFile(){
-  int fd = open("story.txt", O_RDWR | O_TRUNC);
+  int fd;
+  if( access( "story.txt", F_OK ) != -1 ) {
+    fd = open("story.txt", O_RDWR | O_TRUNC);
+  }
+  else{
+    fd = open("story.txt", O_RDWR | O_CREAT, 0644);
+  }
   printf("File opened, file descriptor: %d\n",fd);
   return fd;
 }
@@ -72,22 +79,21 @@ int closeFile(int fd){
 }
 
 int main(int argc, char *argv[]){
+  umask(0000);
   int semid;
   int shmid;
   int sc;
   int *sh;
-  int fd;
+  int fd = openFile();
   int key = ftok("makefile", 22);
   if (strncmp(argv[1], "-c", strlen(argv[1])) == 0){
     semid = createSemaphore(&sc);
     shmid = createShmem(sh);
-    fd = openFile();
-    
   }
   else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
     char buf[256];
-    printf("Lseek %d\n",lseek(3, 1, SEEK_SET));
-    read(3, buf, 256);
+    printf("Lseek %ld\n",lseek(fd, 0, SEEK_SET));
+    read(fd, buf, 256);
     printf("%s\n",buf);
   }
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){

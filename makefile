@@ -1,5 +1,5 @@
 strtest: semctrl
 	gcc semctrl.c -o semctrl
-	gcc semclient.c -o semclient
+	gcc filctl.c -o filctrl
 run:
-	./a.out
+	./filctrl

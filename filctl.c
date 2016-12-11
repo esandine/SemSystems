@@ -37,16 +37,22 @@ int main (){
   //start if semaphore not 0.
   semop(semid, &sb, 1);
 
-  if( access( "phone.txt", F_OK ) != -1 ) {
-    fd = open("phone.txt", O_RDWR);
-    lseek(fd, *length * -1, SEEK_END);
-    char buf[*length];//buffer for reading
-    read(fd, buf, *length);
-    printf("Last line:\n%s\n", buf); 
+  if( access( "story.txt", F_OK ) != -1 ) {
+    fd = open("story.txt", O_RDWR);
+    if(lseek(fd, 0, SEEK_END) == 0){
+      
+    }
+    else{
+      lseek(fd, *length * -1, SEEK_END);
+      char buf[*length];//buffer for reading
+      read(fd, buf, *length);
+      *strchr(buf, '\n') = 0;
+      printf("Last line:\n%s\n", buf);
+    }
   }
   else{
     *length = 0;
-    fd = open("phone.txt", O_RDWR | O_CREAT, 0644);
+    fd = open("story.txt", O_RDWR | O_CREAT, 0644);
     printf("File created\n");
   }
   printf("Next line:\n");
